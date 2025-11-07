@@ -1,5 +1,5 @@
 # Use a lightweight official Node.js image as the base
-FROM node:22-slim
+FROM node:20-slim
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -19,4 +19,4 @@ ENV PORT 8080
 EXPOSE $PORT
 
 # Define the command to run your application
-CMD ["npm", "start"]
+CMD ["node", "index.js"]
