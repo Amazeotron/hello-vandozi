@@ -19,4 +19,4 @@ ENV PORT 8080
 EXPOSE $PORT
 
 # Define the command to run your application
-CMD ["node", "index.js"]
+CMD ["npm", "start"]
