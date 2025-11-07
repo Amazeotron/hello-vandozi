@@ -11,5 +11,5 @@ const app = (0, express_1.default)();
 app.get("/surf-conditions", surf_conditions_1.surfConditions);
 const port = parseInt(process.env.PORT || "8080", 10);
 app.listen(port, () => {
-    console.log(`helloworld: listening on port ${port}`);
+    console.log(`Vandozi: listening on port ${port}`);
 });
