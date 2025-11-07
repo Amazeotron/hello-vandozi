@@ -28,7 +28,16 @@ export const surfConditions = async (req: Request, res: Response) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(200).send(JSON.stringify(surfData));
+    const audioFilePath = await synthesizeText(
+      "Sorry, we couldn't retrieve the surf conditions."
+    );
+
+    res.setHeader("Content-Type", "audio/mpeg");
+    res.sendFile(audioFilePath, (err) => {
+      if (err) {
+        res.status(500).send(err);
+      }
+    });
     return;
   }
 };
