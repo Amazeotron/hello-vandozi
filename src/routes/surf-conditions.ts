@@ -3,7 +3,6 @@ import type { Request, Response } from "express";
 import fetch from "node-fetch";
 
 export const surfConditions = async (req: Request, res: Response) => {
-  const surfData = {};
   try {
     const response = await fetch(
       "https://services.surfline.com/kbyg/regions/forecasts/conditions?subregionId=5cc73566c30e4c0001096989&days=1&accesstoken=b892cc4f756bdbce41c7abfd05f96cae384664fd"
@@ -18,20 +17,34 @@ export const surfConditions = async (req: Request, res: Response) => {
       .replace(/\n+/g, " ")
       .trim();
 
-    const audioFilePath = await synthesizeText(cleanedObservation);
+    const maybeAudioFilePath = await synthesizeText(cleanedObservation);
 
-    res.setHeader("Content-Type", "audio/mpeg");
-    res.sendFile(audioFilePath, (err) => {
-      if (err) {
-        res.status(500).send(err);
-      }
-    });
+    if (
+      maybeAudioFilePath &&
+      typeof maybeAudioFilePath === "object" &&
+      "error" in maybeAudioFilePath
+    ) {
+      res.status(500).send(maybeAudioFilePath.error);
+    } else if (typeof maybeAudioFilePath === "string") {
+      res.setHeader("Content-Type", "audio/mpeg");
+      res.sendFile(maybeAudioFilePath, (err) => {
+        if (err) {
+          res.status(500).send(err);
+        }
+      });
+    } else {
+      res.status(500).send("Unexpected error occurred.");
+    }
   } catch (err) {
     console.error(err);
     const audioFilePath = await synthesizeText(
       "Sorry, we couldn't retrieve the surf conditions."
     );
 
+    if (typeof audioFilePath !== "string") {
+      res.status(500).send("Unexpected error occurred.");
+      return;
+    }
     res.setHeader("Content-Type", "audio/mpeg");
     res.sendFile(audioFilePath, (err) => {
       if (err) {

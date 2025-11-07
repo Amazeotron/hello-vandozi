@@ -13,7 +13,7 @@ export async function synthesizeText(text, fileName = "output.mp3") {
     const audioFilePath = path.join(dir, fileName);
     const [response] = await client.synthesizeSpeech(request);
     if (!response.audioContent) {
-        throw new Error("No audio content received from Text-to-Speech API");
+        return { error: "No audio content received from Text-to-Speech API" };
     }
     const writeFile = util.promisify(fs.writeFile);
     await writeFile(audioFilePath, response.audioContent, "binary");
