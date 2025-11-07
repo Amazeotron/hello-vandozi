@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "moduleResolution": "node10",
     "esModuleInterop": true,
     "baseUrl": "./src",
     "paths": {
@@ -17,20 +16,3 @@
     "resolveJsonModule": true
   }
 }
-// {
-//   "extends": "@tsconfig/node22/tsconfig.json",
-//   "include": ["src/**/*"],
-//   "exclude": ["node_modules"],
-//   "compilerOptions": {
-//     "baseUrl": "./src", // Or your desired base URL
-//     "paths": {
-//       "@src/*": ["src/*", "dist/src/*"],
-//       "@routes/*": ["src/routes/*"],
-//       "@utils/*": ["src/utils/*"]
-//     },
-//     "outDir": "dist"
-//   },
-//   "ts-node": {
-//     "require": ["tsconfig-paths/register"]
-//   }
-// }

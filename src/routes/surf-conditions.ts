@@ -1,4 +1,4 @@
-import { synthesizeText } from "@src/utils/synthesize-text";
+import { synthesizeText } from "@src/utils/synthesize-text.js";
 import type { Request, Response } from "express";
 import fetch from "node-fetch";
 
