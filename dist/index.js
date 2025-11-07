@@ -1,11 +1,15 @@
-import express from "express";
-import dotenv from "dotenv";
-import { surfConditions } from "./surf-conditions";
-dotenv.config({ path: ".env" });
-const app = express();
-app.get("/surf-conditions", surfConditions);
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const dotenv_1 = __importDefault(require("dotenv"));
+const surf_conditions_1 = require("./routes/surf-conditions");
+dotenv_1.default.config({ path: ".env" });
+const app = (0, express_1.default)();
+app.get("/surf-conditions", surf_conditions_1.surfConditions);
 const port = parseInt(process.env.PORT || "8080", 10);
 app.listen(port, () => {
     console.log(`helloworld: listening on port ${port}`);
 });
-//# sourceMappingURL=index.js.map

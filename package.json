@@ -7,13 +7,14 @@
   "type": "module",
   "main": "index.js",
   "engines": {
-    "node": ">=22.0.0"
+    "node": "22.x.x"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
-    "build": "tsc && tsc-alias"
+    "build": "npx tsc && tsc-alias",
+    "gcp-build": "npx tsc && tsc-alias"
   },
   "dependencies": {
     "@google-cloud/text-to-speech": "^6.4.0",
