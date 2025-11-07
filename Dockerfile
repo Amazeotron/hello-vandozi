@@ -1,5 +1,5 @@
 # Use a lightweight official Node.js image as the base
-FROM node:google-22
+FROM node:22-slim
 
 # Set the working directory inside the container
 WORKDIR /app
