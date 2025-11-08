@@ -11,12 +11,8 @@ const fetchSurfReport = async () => {
     "https://services.surfline.com/kbyg/regions/forecasts/conditions?subregionId=5cc73566c30e4c0001096989&days=1&accesstoken=b892cc4f756bdbce41c7abfd05f96cae384664fd"
   );
   // Test to see if the repsonse is html or json
-  const contentType = response.headers.get("content-type");
   const responseText = await response.clone().text();
-  if (
-    (contentType && contentType.includes("text/html")) ||
-    responseText.startsWith("<")
-  ) {
+  if (responseText.startsWith("<")) {
     return {
       type: "html",
       body: responseText,
