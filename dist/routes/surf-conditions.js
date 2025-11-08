@@ -25,27 +25,33 @@ const fetchSurfReport = async () => {
     }
 };
 export const surfConditions = async (req, res) => {
-    const surfData = await fetchSurfReport();
-    if (surfData.type === "html") {
-        // send the html response as is
-        res.status(200).send(surfData.body);
-        return;
+    try {
+        const surfData = await fetchSurfReport();
+        if (surfData.type === "html") {
+            // send the html response as is
+            res.status(200).send(surfData.body);
+            return;
+        }
+        const maybeAudioFilePath = await synthesizeText(surfData.body);
+        if (maybeAudioFilePath &&
+            typeof maybeAudioFilePath === "object" &&
+            "error" in maybeAudioFilePath) {
+            res.status(500).send(maybeAudioFilePath.error);
+        }
+        else if (typeof maybeAudioFilePath === "string") {
+            res.setHeader("Content-Type", "audio/mpeg");
+            res.sendFile(maybeAudioFilePath, (err) => {
+                if (err) {
+                    res.status(500).send(err);
+                }
+            });
+        }
+        else {
+            res.status(500).send("Unexpected error occurred.");
+        }
     }
-    const maybeAudioFilePath = await synthesizeText(surfData.body);
-    if (maybeAudioFilePath &&
-        typeof maybeAudioFilePath === "object" &&
-        "error" in maybeAudioFilePath) {
-        res.status(500).send(maybeAudioFilePath.error);
-    }
-    else if (typeof maybeAudioFilePath === "string") {
-        res.setHeader("Content-Type", "audio/mpeg");
-        res.sendFile(maybeAudioFilePath, (err) => {
-            if (err) {
-                res.status(500).send(err);
-            }
-        });
-    }
-    else {
-        res.status(500).send("Unexpected error occurred.");
+    catch (err) {
+        res.status(500).send(err);
+        console.error(err);
     }
 };
