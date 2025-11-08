@@ -26,7 +26,9 @@ const fetchSurfReport = async () => {
   if (!response.ok) {
     return {
       type: "html",
-      body: `<h1>Error fetching surf report: ${response.status} ${response.statusText}, ${response.body}</h1>`,
+      body: `<h1>Error fetching surf report: ${response.status} ${
+        response.statusText
+      }, ${response.body ? JSON.stringify(response.body) : ""}</h1>`,
     };
   }
 
