@@ -10,6 +10,14 @@ const fetchSurfReport = async () => {
   const response = await fetch(
     "https://services.surfline.com/kbyg/regions/forecasts/conditions?subregionId=5cc73566c30e4c0001096989&days=1&accesstoken=b892cc4f756bdbce41c7abfd05f96cae384664fd"
   );
+
+  if (!response.ok) {
+    return {
+      type: "html",
+      body: `<h1>Error fetching surf report: ${response.status} ${response.statusText}</h1>`,
+    };
+  }
+
   // Test to see if the repsonse is html or json
   const responseText = await response.clone().text();
   if (responseText.startsWith("<")) {
