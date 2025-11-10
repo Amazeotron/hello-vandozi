@@ -1,40 +1,63 @@
 import { synthesizeText } from "../utils/synthesize-text.js";
-import { Impit } from "impit";
-const impit = new Impit({
-    browser: "chrome", // or "firefox"
-    proxyUrl: "http://localhost:8080",
-    ignoreTlsErrors: true,
-});
+// import { Impit } from "impit";
+// import fetch from "node-fetch";
+import { newInjectedContext } from "fingerprint-injector";
+import { chromium } from "playwright";
+const url = "https://services.surfline.com/kbyg/regions/forecasts/conditions?subregionId=5cc73566c30e4c0001096989&days=1&accesstoken=b892cc4f756bdbce41c7abfd05f96cae384664fd";
 const fetchSurfReport = async () => {
-    const url = "https://services.surfline.com/kbyg/regions/forecasts/conditions?subregionId=5cc73566c30e4c0001096989&days=1&accesstoken=b892cc4f756bdbce41c7abfd05f96cae384664fd";
-    const response = await impit.fetch(url);
-    if (!response.ok) {
-        return {
-            type: "html",
-            body: `<h1>Error fetching surf report: ${response.status} ${response.statusText}, ${response.body ? JSON.stringify(response.body) : ""}</h1>`,
-        };
-    }
-    // Test to see if the repsonse is html or json
-    const responseText = await response.text();
-    if (responseText.startsWith("<")) {
-        return {
-            type: "html",
-            body: responseText,
-        };
-    }
-    else {
-        const json = (await response.json());
-        const { observation } = json.data.conditions[0];
-        // remove any <br> tags or \n characters
-        const cleanedObservation = observation
-            .replace(/<br\s*\/?>/gi, " ")
-            .replace(/\n+/g, " ")
-            .trim();
-        return {
-            type: "text",
-            body: cleanedObservation,
-        };
-    }
+    const browser = await chromium.launch({ headless: true });
+    const context = await newInjectedContext(browser, {
+        // Constraints for the generated fingerprint (optional)
+        fingerprintOptions: {
+            devices: ["desktop"],
+            operatingSystems: ["macos"],
+        },
+        // Playwright's newContext() options (optional, random example for illustration)
+        newContextOptions: {
+            geolocation: {
+                latitude: -37.50853,
+                longitude: 121.12574,
+            },
+        },
+    });
+    const page = await context.newPage();
+    await page.goto(url);
+    const jsonData = await page.evaluate(() => {
+        return JSON.parse(document.body.textContent);
+    });
+    await browser.close();
+    return {
+        type: "text",
+        body: jsonData.data.conditions[0].observation,
+    };
+    // if (!response.ok) {
+    //   return {
+    //     type: "html",
+    //     body: `<h1>Error fetching surf report: ${response.status} ${
+    //       response.statusText
+    //     }, ${response.body ? JSON.stringify(response.body) : ""}</h1>`,
+    //   };
+    // }
+    // // Test to see if the repsonse is html or json
+    // const responseText = await response.text();
+    // if (responseText.startsWith("<")) {
+    //   return {
+    //     type: "html",
+    //     body: responseText,
+    //   };
+    // } else {
+    //   const json = (await response.json()) as SurfDataType;
+    //   const { observation } = json.data.conditions[0];
+    //   // remove any <br> tags or \n characters
+    //   const cleanedObservation = observation
+    //     .replace(/<br\s*\/?>/gi, " ")
+    //     .replace(/\n+/g, " ")
+    //     .trim();
+    //   return {
+    //     type: "text",
+    //     body: cleanedObservation,
+    //   };
+    // }
 };
 export const surfConditions = async (req, res) => {
     try {
@@ -63,6 +86,7 @@ export const surfConditions = async (req, res) => {
         }
     }
     catch (err) {
+        console.log("Caught error in surfConditions:", err);
         res.status(500).send(err);
         console.error(err);
     }

@@ -20,8 +20,9 @@
     "@google-cloud/text-to-speech": "^6.4.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "impit": "^0.7.0",
-    "node-fetch": "^3.3.2"
+    "fingerprint-injector": "^2.1.76",
+    "node-fetch": "^3.3.2",
+    "playwright": "^1.56.1"
   },
   "devDependencies": {
     "@swc/core": "^1.15.0",
