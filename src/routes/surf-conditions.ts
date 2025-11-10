@@ -102,8 +102,11 @@ export const surfConditions = async (req: Request, res: Response) => {
       res.status(500).send("Unexpected error occurred.");
     }
   } catch (err) {
-    console.log("Caught error in surfConditions:", err);
-    res.status(500).send(err);
-    console.error(err);
+    const errErr = err as Error;
+    console.log("Caught error in surfConditions:", errErr);
+    res
+      .status(500)
+      .send("message" in errErr ? errErr.message : "Unknown error");
+    console.error(errErr.stack);
   }
 };
