@@ -23,9 +23,11 @@ const fetchSurfReport = async () => {
     // Playwright's newContext() options (optional, random example for illustration)
     newContextOptions: {
       geolocation: {
-        latitude: -37.50853,
-        longitude: 121.12574,
+        latitude: 37.8044853,
+        longitude: -122.4590763,
       },
+      userAgent:
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
     },
   });
   const page = await context.newPage();
