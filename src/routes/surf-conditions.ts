@@ -1,9 +1,5 @@
 import { synthesizeText } from "@src/utils/synthesize-text.js";
 import type { Request, Response } from "express";
-// import { Impit } from "impit";
-// import fetch from "node-fetch";
-import { newInjectedContext } from "fingerprint-injector";
-import { chromium } from "playwright";
 
 type SurfDataType = {
   data: { conditions: { observation: string }[] };
@@ -17,7 +13,7 @@ const url =
 const endpoint = "https://production-sfo.browserless.io/chromium/bql";
 const token = "2TOpaSCtaEcRez7717502587ee2a117f0f2d859baba3ec452";
 
-export async function fetchBrowserQL() {
+export async function fetchSurfReport() {
   const response = await fetch(`${endpoint}?token=${token}`, {
     method: "POST",
     headers: {
@@ -29,14 +25,8 @@ export async function fetchBrowserQL() {
         goto(url: $url, waitUntil: networkIdle) {
           status
         }
-        response(url: "https://services.surfline.com/kbyg/regions/forecasts/conditions/**", type: [xhr, fetch]) {
-          url
-          status
-          headers {
-            name
-            value
-          }
-          body
+        selector: text(selector: "[class^='SpotCurrentConditions_currentConditionsReportContainer']") {
+          text
         }
       }`,
       variables: {
@@ -45,83 +35,25 @@ export async function fetchBrowserQL() {
     }),
   });
 
-  const data = await response.text();
+  const data = (await response.json()) as {
+    data: {
+      selector: {
+        text: string;
+      } | null;
+    };
+  };
+  // See if there is a data.data.selector
+  const body = data.data.selector?.text;
   return {
     type: "text",
-    body: data,
+    body: body || "No surf report available at the moment.",
   };
 }
-
-// const fetchViaPlaywright = async () => {
-//   const browser = await chromium.launch({ headless: true });
-//   const context = await newInjectedContext(browser, {
-//     // Constraints for the generated fingerprint (optional)
-//     fingerprintOptions: {
-//       devices: ["desktop"],
-//       operatingSystems: ["macos"],
-//     },
-//     // Playwright's newContext() options (optional, random example for illustration)
-//     newContextOptions: {
-//       geolocation: {
-//         latitude: 37.8044853,
-//         longitude: -122.4590763,
-//       },
-//       userAgent:
-//         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-//     },
-//   });
-//   const page = await context.newPage();
-//   await page.goto(url);
-//   const jsonData = await page.evaluate(() => {
-//     return JSON.parse(document.body.textContent);
-//   });
-
-//   await browser.close();
-
-//   return {
-//     type: "text",
-//     body: jsonData.data.conditions[0].observation,
-//   };
-// };
-
-const fetchSurfReport = async () => {
-  return await fetchBrowserQL();
-
-  // if (!response.ok) {
-  //   return {
-  //     type: "html",
-  //     body: `<h1>Error fetching surf report: ${response.status} ${
-  //       response.statusText
-  //     }, ${response.body ? JSON.stringify(response.body) : ""}</h1>`,
-  //   };
-  // }
-
-  // // Test to see if the repsonse is html or json
-  // const responseText = await response.text();
-  // if (responseText.startsWith("<")) {
-  //   return {
-  //     type: "html",
-  //     body: responseText,
-  //   };
-  // } else {
-  //   const json = (await response.json()) as SurfDataType;
-  //   const { observation } = json.data.conditions[0];
-  //   // remove any <br> tags or \n characters
-  //   const cleanedObservation = observation
-  //     .replace(/<br\s*\/?>/gi, " ")
-  //     .replace(/\n+/g, " ")
-  //     .trim();
-  //   return {
-  //     type: "text",
-  //     body: cleanedObservation,
-  //   };
-  // }
-};
 
 export const surfConditions = async (req: Request, res: Response) => {
   try {
     console.log("Fetching surf report...");
-    const surfData = await fetchBrowserQL();
+    const surfData = await fetchSurfReport();
     console.log("Surfdata:", surfData.body);
     if (surfData.type === "html") {
       // send the html response as is
