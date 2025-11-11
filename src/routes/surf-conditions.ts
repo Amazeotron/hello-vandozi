@@ -9,39 +9,83 @@ type SurfDataType = {
   data: { conditions: { observation: string }[] };
 };
 
+const pageUrl =
+  "https://www.surfline.com/surf-report/linda-mar-north/5cbf8d85e7b15800014909e8";
 const url =
   "https://services.surfline.com/kbyg/regions/forecasts/conditions?subregionId=5cc73566c30e4c0001096989&days=1&accesstoken=b892cc4f756bdbce41c7abfd05f96cae384664fd";
 
-const fetchSurfReport = async () => {
-  const browser = await chromium.launch({ headless: true });
-  const context = await newInjectedContext(browser, {
-    // Constraints for the generated fingerprint (optional)
-    fingerprintOptions: {
-      devices: ["desktop"],
-      operatingSystems: ["macos"],
+const endpoint = "https://production-sfo.browserless.io/chromium/bql";
+const token = "2TOpaSCtaEcRez7717502587ee2a117f0f2d859baba3ec452";
+
+export async function fetchBrowserQL() {
+  const response = await fetch(`${endpoint}?token=${token}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
     },
-    // Playwright's newContext() options (optional, random example for illustration)
-    newContextOptions: {
-      geolocation: {
-        latitude: 37.8044853,
-        longitude: -122.4590763,
+    body: JSON.stringify({
+      query: `
+      mutation GetSurfReport($url: String!) {
+        goto(url: $url, waitUntil: networkIdle) {
+          status
+        }
+        response(url: "https://services.surfline.com/kbyg/regions/forecasts/conditions/**", type: [xhr, fetch]) {
+          url
+          status
+          headers {
+            name
+            value
+          }
+          body
+        }
+      }`,
+      variables: {
+        url: pageUrl,
       },
-      userAgent:
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-    },
-  });
-  const page = await context.newPage();
-  await page.goto(url);
-  const jsonData = await page.evaluate(() => {
-    return JSON.parse(document.body.textContent);
+    }),
   });
 
-  await browser.close();
-
+  const data = await response.text();
   return {
     type: "text",
-    body: jsonData.data.conditions[0].observation,
+    body: data,
   };
+}
+
+// const fetchViaPlaywright = async () => {
+//   const browser = await chromium.launch({ headless: true });
+//   const context = await newInjectedContext(browser, {
+//     // Constraints for the generated fingerprint (optional)
+//     fingerprintOptions: {
+//       devices: ["desktop"],
+//       operatingSystems: ["macos"],
+//     },
+//     // Playwright's newContext() options (optional, random example for illustration)
+//     newContextOptions: {
+//       geolocation: {
+//         latitude: 37.8044853,
+//         longitude: -122.4590763,
+//       },
+//       userAgent:
+//         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+//     },
+//   });
+//   const page = await context.newPage();
+//   await page.goto(url);
+//   const jsonData = await page.evaluate(() => {
+//     return JSON.parse(document.body.textContent);
+//   });
+
+//   await browser.close();
+
+//   return {
+//     type: "text",
+//     body: jsonData.data.conditions[0].observation,
+//   };
+// };
+
+const fetchSurfReport = async () => {
+  return await fetchBrowserQL();
 
   // if (!response.ok) {
   //   return {
@@ -76,7 +120,9 @@ const fetchSurfReport = async () => {
 
 export const surfConditions = async (req: Request, res: Response) => {
   try {
-    const surfData = await fetchSurfReport();
+    console.log("Fetching surf report...");
+    const surfData = await fetchBrowserQL();
+    console.log("Surfdata:", surfData.body);
     if (surfData.type === "html") {
       // send the html response as is
       res.status(200).send(surfData.body);
