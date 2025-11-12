@@ -1,6 +1,6 @@
-import { cronSurfReport } from "@src/cron.js";
-import prisma from "@src/prisma/singleton.js";
-import { surfConditions } from "@src/routes/surf-conditions.js";
+import { cronSurfReport } from "./cron.js";
+import prisma from "./prisma/singleton.js";
+import { surfConditions } from "./routes/surf-conditions.js";
 import express from "express";
 import dotenv from "dotenv";
 import path from "path";

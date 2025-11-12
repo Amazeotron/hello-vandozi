@@ -1,6 +1,6 @@
 import cron from "node-cron";
-import { fetchSurfReport } from "@src/routes/surf-conditions.js";
-import prisma from "@src/prisma/singleton.js";
+import { fetchSurfReport } from "./routes/surf-conditions.js";
+import prisma from "./prisma/singleton.js";
 export const cronSurfReport = async () => {
     // once every 6 hours, fetch surf report and store in DB
     cron.schedule("0 */6 * * *", async () => {
