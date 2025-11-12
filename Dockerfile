@@ -9,7 +9,24 @@ COPY package*.json ./
 
 # Install project dependencies
 RUN npm install
-RUN npm run build
+
+# Copy TypeScript source code and tsconfig.json
+COPY tsconfig.json ./
+COPY src ./src
+COPY prisma.config.js ./
+
+RUN apt-get update -y && apt-get install -y openssl
+
+COPY .env ./.env
+# Get contents of .env file and set as environment variables
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
+RUN echo "DATABASE_URL=$DATABASE_URL"
+
+RUN npx prisma generate
+
+# Compile TypeScript to JavaScript
+RUN npx tsc && ./node_modules/.bin/tsc-alias
 
 # Copy the rest of the application code
 COPY . .

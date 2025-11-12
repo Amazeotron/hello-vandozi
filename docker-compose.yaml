@@ -1,0 +1,8 @@
+services:
+  web:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        - DATABASE_URL=$DATABASE_URL
+        - GOOGLE_APPLICATION_CREDENTIALS_JSON=$GOOGLE_APPLICATION_CREDENTIALS

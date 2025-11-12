@@ -4,7 +4,7 @@ import { surfConditions } from "./routes/surf-conditions.js";
 import express from "express";
 import dotenv from "dotenv";
 import path from "path";
-dotenv.config({ path: path.resolve(".env") });
+dotenv.config({ path: path.resolve("./", ".env") });
 const app = express();
 cronSurfReport();
 app.get("/", async (_, res) => {
