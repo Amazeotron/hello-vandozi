@@ -9,9 +9,12 @@ COPY package*.json ./
 
 # Install project dependencies
 RUN npm install
+RUN npm run build
 
 # Copy the rest of the application code
 COPY . .
+ARG GOOGLE_APPLICATION_CREDENTIALS_JSON
+RUN echo $GOOGLE_APPLICATION_CREDENTIALS_JSON > /app/vandozi-e6e1073d409a.json && export GOOGLE_APPLICATION_CREDENTIALS=/app/vandozi-e6e1073d409a.json
 
 # Expose the port your application listens on
 # Cloud Run injects the PORT environment variable, so your app should listen on process.env.PORT

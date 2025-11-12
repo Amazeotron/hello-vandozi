@@ -2,3 +2,4 @@
 vandozi-e6e1073d409a.json
 node_modules/*
 .env
+/prisma/prisma

@@ -1,4 +1,4 @@
-import { synthesizeText } from "../utils/synthesize-text.js";
+import { synthesizeText } from "@src/utils/synthesize-text.js";
 const pageUrl = "https://www.surfline.com/surf-report/linda-mar-north/5cbf8d85e7b15800014909e8";
 const url = "https://services.surfline.com/kbyg/regions/forecasts/conditions?subregionId=5cc73566c30e4c0001096989&days=1&accesstoken=b892cc4f756bdbce41c7abfd05f96cae384664fd";
 const endpoint = "https://production-sfo.browserless.io/chromium/bql";

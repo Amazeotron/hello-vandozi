@@ -14,18 +14,26 @@
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
     "build": "npx tsc && tsc-alias",
-    "gcp-build": "npx tsc && tsc-alias"
+    "gcp-build": "npx tsc && tsc-alias",
+    "prisma:generate": "env-cmd npx prisma generate --no-engine",
+    "prisma:migrate": "env-cmd npx prisma migrate dev",
+    "prisma:studio": "env-cmd npx prisma studio"
   },
   "dependencies": {
     "@google-cloud/text-to-speech": "^6.4.0",
+    "@prisma/client": "^6.19.0",
+    "@prisma/extension-accelerate": "^2.0.2",
     "dotenv": "^17.2.3",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "node-cron": "^4.2.1",
+    "prisma": "^6.19.0"
   },
   "devDependencies": {
     "@swc/core": "^1.15.0",
     "@tsconfig/node22": "^22.0.2",
     "@types/express": "^5.0.5",
     "@types/node": "^24.10.0",
+    "env-cmd": "^11.0.0",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.16",
