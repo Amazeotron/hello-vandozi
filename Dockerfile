@@ -17,7 +17,7 @@ COPY prisma.config.js ./
 
 RUN apt-get update -y && apt-get install -y openssl
 
-COPY .env .env
+# COPY .env .env
 # Get contents of .env file and set as environment variables
 ARG DATABASE_URL
 ENV DATABASE_URL=${DATABASE_URL}
