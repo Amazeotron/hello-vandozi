@@ -17,13 +17,13 @@ COPY prisma.config.js ./
 
 RUN apt-get update -y && apt-get install -y openssl
 
-# COPY .env ./.env
+COPY .env .env
 # Get contents of .env file and set as environment variables
 ARG DATABASE_URL
 ENV DATABASE_URL=${DATABASE_URL}
 RUN echo "DATABASE_URL=$DATABASE_URL"
 
-RUN npx prisma generate
+RUN npx prisma generate --no-engine
 
 # Compile TypeScript to JavaScript
 RUN npx tsc && ./node_modules/.bin/tsc-alias
@@ -31,7 +31,9 @@ RUN npx tsc && ./node_modules/.bin/tsc-alias
 # Copy the rest of the application code
 COPY . .
 ARG GOOGLE_APPLICATION_CREDENTIALS_JSON
-RUN echo $GOOGLE_APPLICATION_CREDENTIALS_JSON > /app/vandozi-e6e1073d409a.json && export GOOGLE_APPLICATION_CREDENTIALS=/app/vandozi-e6e1073d409a.json
+ENV GOOGLE_APPLICATION_CREDENTIALS_JSON=${GOOGLE_APPLICATION_CREDENTIALS_JSON}
+RUN echo "GOOGLE_APPLICATION_CREDENTIALS_JSON is ${GOOGLE_APPLICATION_CREDENTIALS_JSON} or $GOOGLE_APPLICATION_CREDENTIALS_JSON"
+RUN echo $GOOGLE_APPLICATION_CREDENTIALS_JSON > ./vandozi-e6e1073d409a.json && export GOOGLE_APPLICATION_CREDENTIALS=./vandozi-e6e1073d409a.json
 
 # Expose the port your application listens on
 # Cloud Run injects the PORT environment variable, so your app should listen on process.env.PORT
